@@ -1,0 +1,15 @@
+# @package _global_
+
+defaults:
+  - override /model: vit
+
+model:
+  lr: 5.0e-4
+  dropout: 0.1
+
+trainer:
+  max_epochs: 100
+  precision: bf16-mixed
+
+tags: ["vit", "cifar10", "exp001"]
+notes: "ViT baseline on CIFAR-10"

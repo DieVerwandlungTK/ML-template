@@ -1,0 +1,87 @@
+{
+  "name": "KS-Difusion",
+  "build": {
+    "context": "..",
+    "dockerfile": "../docker/dev.Dockerfile",
+    "options": [
+      "-t",
+      "kinoshita.22039/ks_diffusion:latest"
+    ]
+  },
+  "features": {
+    "ghcr.io/dhoeric/features/hadolint:1": {},
+    "ghcr.io/devcontainers/features/sshd:1": {
+      "version": "latest"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "exiasr.hadolint",
+        "kevinrose.vsc-python-indent",
+        "ms-azuretools.vscode-docker",
+        "njpwerner.autodocstring",
+        "redhat.vscode-yaml",
+        "shardulm94.trailing-spaces",
+        "tamasfe.even-better-toml",
+        "yzhang.markdown-all-in-one",
+        "bungcip.better-toml",
+        "mhutchie.git-graph",
+        "seatonjiang.gitmoji-vscode"
+      ],
+      "settings": {
+        "python.formatting.provider": "ruff",
+        "editor.formatOnSave": true,
+        "python.linting.enabled": true,
+        "python.linting.lintOnSave": true,
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit"
+          },
+          "editor.formatOnSave": true
+        },
+        "files.insertFinalNewline": true,
+        "files.trimTrailingWhitespace": true,
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        }
+      }
+    }
+  },
+  "containerEnv": {
+    "PYTHONUNBUFFERED": "True",
+    "UV_LINK_MODE": "copy",
+    "UV_CACHE_DIR": "/home/appuser/.cache/uv",
+    "SSH_AUTHORIZED_KEYS": "${localEnv:SSH_AUTHORIZED_KEYS}",
+    "TOKENIZERS_PARALLELISM": "false"
+  },
+  "remoteUser": "appuser",
+  "runArgs": [
+    "--gpus",
+    "all",
+    "--privileged",
+    "-p",
+    "0.0.0.0:0:2222",
+    "--shm-size=64g",
+    "--env-file",
+    ".env"
+  ],
+  "postCreateCommand": "sudo ssh-keygen -A && mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && echo 'echo -e \"$SSH_AUTHORIZED_KEYS\" >> ~/.ssh/authorized_keys' >> ~/.bashrc && mkdir -p /tmp/uv-cache && sudo /usr/sbin/sshd && echo 'cd /app' >> ~/.bashrc && uv sync && curl -fsSL https://claude.ai/install.sh | bash && echo 'export PATH=\"$HOME/.local/bin:$PATH\"' >> ~/.bashrc && source ~/.bashrc",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
+  "workspaceFolder": "/app",
+  "remoteEnv": {
+    "SSH_AUTHORIZED_KEYS": "${localEnv:SSH_AUTHORIZED_KEYS}"
+  },
+  "mounts": [
+    "source=hf_cache,target=/home/appuser/.cache/huggingface,type=volume",
+    "source=uv_cache,target=/home/appuser/.cache/uv,type=volume",
+    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind"
+  ]
+}

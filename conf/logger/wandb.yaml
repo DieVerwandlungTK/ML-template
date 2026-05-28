@@ -1,0 +1,5 @@
+_target_: lightning.pytorch.loggers.WandbLogger
+project: ml-template
+name: null
+save_dir: .
+log_model: false

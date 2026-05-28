@@ -1,0 +1,12 @@
+defaults:
+  - model: resnet
+  - data: cifar10
+  - trainer: default
+  - callbacks: default
+  - logger: wandb
+  - experiment: null
+  - _self_
+
+seed: 42
+tags: []
+notes: ""

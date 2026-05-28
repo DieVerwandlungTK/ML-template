@@ -1,0 +1,93 @@
+[project]
+name = "ml-template"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic",
+    "pydantic-settings",
+    "typer",
+    "transformers==4.57.3",
+    "datasets>=4.3.0",
+    "hydra-core",
+    "lightning",
+    "einops",
+    "wandb",
+    "peft<0.19.0",
+    "bitsandbytes",
+    "deepspeed",
+    "unsloth>=2026.4.1",
+    "trl==0.19.1",
+]
+
+# CUDA バージョンを指定してインストール:
+#   uv sync --extra cu128   # CUDA 12.8（推奨）
+#   uv sync --extra cu126   # CUDA 12.6
+#   uv sync --extra cu130   # CUDA 13.0
+[project.optional-dependencies]
+cu126 = ["torch", "torchvision", "torchaudio", "flash-attn"]
+cu128 = ["torch", "torchvision", "torchaudio", "flash-attn"]
+cu130 = ["torch", "torchvision", "torchaudio", "flash-attn"]
+
+[dependency-groups]
+dev = ["pytest>=8.3.4", "ruff>=0.3.5"]
+
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
+pythonpath = ["src"]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu126", extra = "cu126" },
+    { index = "pytorch-cu128", extra = "cu128" },
+    { index = "pytorch-cu130", extra = "cu130" },
+]
+torchvision = [
+    { index = "pytorch-cu126", extra = "cu126" },
+    { index = "pytorch-cu128", extra = "cu128" },
+    { index = "pytorch-cu130", extra = "cu130" },
+]
+torchaudio = [
+    { index = "pytorch-cu126", extra = "cu126" },
+    { index = "pytorch-cu128", extra = "cu128" },
+    { index = "pytorch-cu130", extra = "cu130" },
+]
+flash-attn = [
+    { url = "https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.0/flash_attn-2.8.3+cu126torch2.10-cp312-cp312-linux_x86_64.whl", extra = "cu126" },
+    { url = "https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.0/flash_attn-2.8.3+cu128torch2.10-cp312-cp312-linux_x86_64.whl", extra = "cu128" },
+    { url = "https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.0/flash_attn-2.8.3+cu130torch2.10-cp312-cp312-linux_x86_64.whl", extra = "cu130" },
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/"]
+
+[tool.mypy]
+ignore_missing_imports = true
+follow_imports = "skip"
+disable_error_code = ["*"]
+
+[tool.pyright]
+typeCheckingMode = "off"
